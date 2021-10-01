@@ -7,74 +7,97 @@ import org.jetbrains.annotations.NotNull
 import java.sql.Connection
 import java.sql.DriverManager
 import java.sql.SQLException
-import kotlin.properties.Delegates
 
-fun databaseOf(filePath: String, table: String): Database {
-    return Database(DBType.SQLITE, filePath, table)
+// fun databaseOf(connection: SQLite): Database {
+//     return Database(connection)
+// }
+
+fun databaseOf(connection: MySQL): Database {
+    return Database(connection)
 }
 
-fun databaseOf(url: String, port: Int, database: String): Database {
-    return Database(DBType.MYSQL, url, port, database)
+fun databaseOf(connection: Mongo): Database {
+    return Database(connection)
 }
 
 class Database {
 
-    constructor(db_type: DBType, url: String, port: Int, database: String) {
-        this.dbType = db_type
-        this.url = url
-        this.port = port
-        this.database = database
+    // constructor(connection: SQLite) {
+    //     dbType = DBType.SQLITE
+    //     url = connection.filePath
+    //     database = connection.table
+    // }
+
+    constructor(connection: MySQL) {
+        dbType = DBType.MYSQL
+        url = connection.url
+        port = connection.port
+        database = connection.database_name
     }
 
-    constructor(db_type: DBType, filePath: String, table: String) {
-
+    constructor(connection: Mongo) {
+        dbType = DBType.MONGO
+        url = connection.url
+        port = connection.port
+        database = connection.database_name
     }
 
-    private lateinit var username: String
-    private lateinit var password: String
+    // USER CERTIFICATE
+    private var username: String? = null
+    private var password: String? = null
 
-    private var dbType: DBType
+    // DATABASE CONFIG
+    private var dbType: DBType? = null
+    private var url: String? = null
+    private var port : Int? = null
+    private var database: String? = null
 
-    private lateinit var url: String
-    private var port by Delegates.notNull<Int>()
-
-    private lateinit var database: String
-
+    // MONGO CLIENT ONLY
     private lateinit var mongoClient: MongoClient
 
-    fun login(username: String, password: String) {
-        this.username = username
-        this.password = password
-    }
+    // Non-Connection(SQLite) Only
+    // fun connect() {
+    //     println("Try connect to SQLite")
+    //     Class.forName("org.sqlite.JDBC")
+
+    //     try {
+    //         connection = DriverManager.getConnection("${dbType?.db_type}://${url}")
+    //         println("Connected ${dbType?.db_type}://$url")
+    //     } catch (exception: Exception) {
+    //         exception.printStackTrace()
+    //     } catch (exception: SQLException) {
+    //         exception.printStackTrace()
+    //     }
+    // }
 
     fun connect(@NotNull username: String, @NotNull password: String) {
         when (dbType) {
             DBType.SQLITE -> {
-                println("Try connect to SQLite")
-                Class.forName("org.sqlite.JDBC")
+                println("Cannot connect ${dbType?.db_type}://${url}. Because this function is not Non-Connection only!")
+                return
             }
 
             DBType.MYSQL -> {
                 println("Selected MySQL")
                 Class.forName("com.mysql.cj.jdbc.Driver")
+
+                this.username = username
+                this.password = password
+
+                try {
+                    connection = DriverManager.getConnection("${dbType?.db_type}://${url}:${port}/${database}", username, password)
+                    println("Connected ${dbType?.db_type}://$url:$port/$database")
+                } catch (exception: Exception) {
+                    exception.printStackTrace()
+                } catch (exception: SQLException) {
+                    exception.printStackTrace()
+                }
             }
 
             DBType.MONGO -> {
-                mongoClient = MongoClients.create("mongo://${url}:${port}")
-                mongoDB = mongoClient.getDatabase(database)
+                mongoClient = MongoClients.create("${dbType?.db_type}://${url}:${port}")
+                mongoDB = mongoClient.getDatabase(database!!)
             }
-        }
-
-        this.username = username
-        this.password = password
-
-        try {
-            connection = DriverManager.getConnection("${dbType.sql_type}://${url}:${port}/${database}", username, password)
-            println("Connected ${dbType.sql_type}://$url:$port/$database")
-        } catch (exception: Exception) {
-            exception.printStackTrace()
-        } catch (exception: SQLException) {
-            exception.printStackTrace()
         }
     }
 
@@ -86,9 +109,9 @@ class Database {
                         println("Database is already connected")
                     } else {
                         println("Try to reconnect to database")
-                        connection = DriverManager.getConnection("${dbType.sql_type}://${url}:${port}/${database}", username, password)
+                        connection = DriverManager.getConnection("${dbType?.db_type}://${url}:${port}/${database}", username, password)
 
-                        println("Reconnected ${dbType.sql_type}://$url:$port/$database")
+                        println("Reconnected ${dbType?.db_type}://$url:$port/$database")
                     }
                 } catch (exception: Exception) {
                     exception.printStackTrace()
@@ -98,8 +121,8 @@ class Database {
             }
 
             DBType.MONGO -> {
-                mongoClient = MongoClients.create("mongo://${url}:${port}")
-                mongoDB = mongoClient.getDatabase(database)
+                mongoClient = MongoClients.create("${dbType?.db_type}://${url}:${port}")
+                mongoDB = mongoClient.getDatabase(database!!)
             }
         }
     }
@@ -120,18 +143,15 @@ class Database {
             }
 
             DBType.MONGO -> {
+                println("Disconnecting...")
                 mongoClient.close()
+
+                println("Database successful disconnected")
             }
         }
     }
 
-    init {
-        dbType = dbTypes
-    }
-
     companion object {
-        private lateinit var dbTypes: DBType
-
         lateinit var connection: Connection // MySQL or SQLite Only
         lateinit var mongoDB: MongoDatabase // Mongo DB Only
     }

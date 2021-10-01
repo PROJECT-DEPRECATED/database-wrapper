@@ -26,7 +26,7 @@ tasks {
         archiveClassifier.set("test")
 
         manifest {
-            attributes["Main-Class"] = "net.projecttl.test.program.TestProgram"
+            attributes["Main-Class"] = "net.projecttl.test.program.TestProgramKt"
         }
     }
 }

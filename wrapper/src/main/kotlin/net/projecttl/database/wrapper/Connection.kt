@@ -1,7 +1,5 @@
 package net.projecttl.database.wrapper
 
-import net.projecttl.database.wrapper.DBType
-
 data class SQLite(val filePath: String, val table: String)
 data class MySQL(val url: String, var port: Int?, val database_name: String) {
     init {

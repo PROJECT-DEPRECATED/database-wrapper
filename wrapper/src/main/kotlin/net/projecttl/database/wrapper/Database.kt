@@ -8,9 +8,9 @@ import java.sql.Connection
 import java.sql.DriverManager
 import java.sql.SQLException
 
-// fun databaseOf(connection: SQLite): Database {
-//     return Database(connection)
-// }
+fun databaseOf(connection: SQLite): Database {
+    return Database(connection)
+}
 
 fun databaseOf(connection: MySQL): Database {
     return Database(connection)
@@ -22,11 +22,11 @@ fun databaseOf(connection: Mongo): Database {
 
 class Database {
 
-    // constructor(connection: SQLite) {
-    //     dbType = DBType.SQLITE
-    //     url = connection.filePath
-    //     database = connection.table
-    // }
+    constructor(connection: SQLite) {
+        dbType = DBType.SQLITE
+        url = connection.filePath
+        database = connection.table
+    }
 
     constructor(connection: MySQL) {
         dbType = DBType.MYSQL
@@ -56,19 +56,24 @@ class Database {
     private lateinit var mongoClient: MongoClient
 
     // Non-Connection(SQLite) Only
-    // fun connect() {
-    //     println("Try connect to SQLite")
-    //     Class.forName("org.sqlite.JDBC")
+    fun connect() {
+        if (dbType == DBType.MYSQL || dbType == DBType.MONGO) {
+            println("This is connection type database!")
+            return
+        } else {
+            println("Try connect to SQLite")
+            Class.forName("org.sqlite.JDBC")
 
-    //     try {
-    //         connection = DriverManager.getConnection("${dbType?.db_type}://${url}")
-    //         println("Connected ${dbType?.db_type}://$url")
-    //     } catch (exception: Exception) {
-    //         exception.printStackTrace()
-    //     } catch (exception: SQLException) {
-    //         exception.printStackTrace()
-    //     }
-    // }
+            try {
+                connection = DriverManager.getConnection("${dbType?.db_type}:${url}")
+                println("Connected ${dbType?.db_type}:$url")
+            } catch (exception: Exception) {
+                exception.printStackTrace()
+            } catch (exception: SQLException) {
+                exception.printStackTrace()
+            }
+        }
+    }
 
     fun connect(@NotNull username: String, @NotNull password: String) {
         when (dbType) {
@@ -103,7 +108,24 @@ class Database {
 
     fun reconnect() {
         when (dbType) {
-            DBType.SQLITE, DBType.MYSQL -> {
+            DBType.SQLITE -> {
+                try {
+                    if (!connection.isClosed) {
+                        println("Database is already connected")
+                    } else {
+                        println("Try to reconnect to database")
+                        connection = DriverManager.getConnection("${dbType?.db_type}:${url}", username, password)
+
+                        println("Reconnected ${dbType?.db_type}:$url")
+                    }
+                } catch (exception: Exception) {
+                    exception.printStackTrace()
+                } catch (exception: SQLException) {
+                    exception.printStackTrace()
+                }
+            }
+
+            DBType.MYSQL -> {
                 try {
                     if (!connection.isClosed) {
                         println("Database is already connected")

@@ -1,22 +1,25 @@
 plugins {
-    kotlin("jvm") version "1.5.10"
+    kotlin("jvm") version "1.5.31"
 }
 
 group = "net.projecttl"
 version = "0.1.0"
 
 allprojects {
-    javaToolChain()
+    apply(plugin = "org.jetbrains.kotlin.jvm")
 
     repositories {
         mavenCentral()
     }
+
+    java {
+        toolchain {
+            languageVersion.set(JavaLanguageVersion.of(11))
+        }
+    }
 }
 
 subprojects {
-    apply(plugin = "org.jetbrains.kotlin.jvm")
-    javaToolChain()
-
     repositories {
         mavenCentral()
     }
@@ -27,13 +30,5 @@ subprojects {
         implementation("mysql:mysql-connector-java:8.0.26")
         implementation("org.mongodb:mongo-java-driver:3.12.10")
         implementation("org.yaml:snakeyaml:1.29")
-    }
-}
-
-fun javaToolChain() {
-    java {
-        toolchain {
-            languageVersion.set(JavaLanguageVersion.of(11))
-        }
     }
 }

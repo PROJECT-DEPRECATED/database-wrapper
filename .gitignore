@@ -3,4 +3,6 @@ build/
 .gradle/
 .idea/
 .vscode/
+
 gradle.properties
+test.sqlite

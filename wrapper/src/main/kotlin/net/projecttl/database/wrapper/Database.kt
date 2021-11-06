@@ -173,6 +173,14 @@ class Database {
         }
     }
 
+    fun getConnection(): Connection {
+        return connection
+    }
+
+    fun getMongoDB(): MongoDatabase {
+        return mongoDB
+    }
+
     companion object {
         lateinit var connection: Connection // MySQL or SQLite Only
         lateinit var mongoDB: MongoDatabase // Mongo DB Only

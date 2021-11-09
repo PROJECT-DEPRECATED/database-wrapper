@@ -3,7 +3,7 @@ plugins {
 }
 
 group = "net.projecttl"
-version = "0.1.1"
+version = "0.2."
 
 allprojects {
     apply(plugin = "org.jetbrains.kotlin.jvm")

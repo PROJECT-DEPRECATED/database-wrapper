@@ -51,6 +51,7 @@ class Database {
     private var url: String? = null
     private var port : Int? = null
     private var database: String? = null
+    private var reconnect: Boolean? = null
 
     // MONGO CLIENT ONLY
     private lateinit var mongoClient: MongoClient
@@ -90,7 +91,11 @@ class Database {
                 this.password = password
 
                 try {
-                    connection = DriverManager.getConnection("${dbType?.db_type}://${url}:${port}/${database}", username, password)
+                    connection = DriverManager.getConnection(
+                        "${dbType?.db_type}://${url}:${port}/${database}?failOverReadOnly=false&maxReconnects=10&autoReconnect=true",
+                        username,
+                        password
+                    )
                     println("Connected ${dbType?.db_type}://$url:$port/$database")
                 } catch (exception: Exception) {
                     exception.printStackTrace()

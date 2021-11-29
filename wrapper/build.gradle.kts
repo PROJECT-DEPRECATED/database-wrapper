@@ -28,6 +28,7 @@ tasks {
 publishing {
     publications {
         create<MavenPublication>(rootProject.name) {
+            artifactId = "database-wrapper"
             from(components["java"])
             artifact(tasks["sourcesJar"])
             artifact(tasks["javadocJar"])

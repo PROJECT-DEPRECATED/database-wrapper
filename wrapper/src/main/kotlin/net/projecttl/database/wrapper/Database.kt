@@ -42,12 +42,15 @@ class Database {
         database = connection.database_name
     }
 
+    lateinit var connection: Connection // MySQL or SQLite Only
+    lateinit var mongoDB: MongoDatabase // Mongo DB Only
+
     // USER CERTIFICATE
     private var username: String? = null
     private var password: String? = null
 
     // DATABASE CONFIG
-    private var dbType: DBType? = null
+    var dbType: DBType? = null
     private var url: String? = null
     private var port : Int? = null
     private var database: String? = null
@@ -176,18 +179,5 @@ class Database {
                 println("Database successful disconnected")
             }
         }
-    }
-
-    fun getConnection(): Connection {
-        return connection
-    }
-
-    fun getMongoDB(): MongoDatabase {
-        return mongoDB
-    }
-
-    companion object {
-        lateinit var connection: Connection // MySQL or SQLite Only
-        lateinit var mongoDB: MongoDatabase // Mongo DB Only
     }
 }

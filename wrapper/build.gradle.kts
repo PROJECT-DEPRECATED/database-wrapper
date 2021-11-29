@@ -39,14 +39,16 @@ publishing {
                     url = uri(if (version.toString().endsWith("SNAPSHOT")) snapshotsRepoUrl else releasesRepoUrl)
 
                     credentials.runCatching {
-                        username = project.properties["username"] as String?
-                        password = project.properties["password"] as String?
+                        val nexusUsername: String by project
+                        val nexusPassword: String by project
+                        username = nexusUsername
+                        password = nexusPassword
                     }
                 }
 
                 pom {
                     name.set(rootProject.name)
-                    description.set("This is minecraft gui library")
+                    description.set("This is database wrapper")
                     url.set("https://github.com/DEVProject04/database-wrapper")
                     licenses {
                         license {
@@ -56,8 +58,8 @@ publishing {
                     }
                     developers {
                         developer {
-                            id.set("ProjectTL12345")
-                            name.set("Project_TL")
+                            id.set("DevProject04")
+                            name.set("Dev_Project")
                             email.set("me@projecttl.net")
                         }
                     }

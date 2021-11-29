@@ -2,6 +2,7 @@ plugins {
     id("com.github.johnrengelman.shadow") version "7.0.0"
     id("org.jetbrains.dokka") version "1.5.0"
     `maven-publish`
+    signing
 }
 
 group = rootProject.group
@@ -26,7 +27,7 @@ tasks {
 
 publishing {
     publications {
-        create<MavenPublication>("${rootProject.name}-api") {
+        create<MavenPublication>(rootProject.name) {
             from(components["java"])
             artifact(tasks["sourcesJar"])
             artifact(tasks["javadocJar"])
@@ -72,4 +73,9 @@ publishing {
             }
         }
     }
+}
+
+signing {
+    isRequired = true
+    sign(publishing.publications[rootProject.name])
 }

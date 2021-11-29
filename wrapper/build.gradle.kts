@@ -2,7 +2,6 @@ plugins {
     id("com.github.johnrengelman.shadow") version "7.0.0"
     id("org.jetbrains.dokka") version "1.5.0"
     `maven-publish`
-    signing
 }
 
 group = rootProject.group
@@ -74,9 +73,4 @@ publishing {
             }
         }
     }
-}
-
-signing {
-    isRequired = true
-    sign(publishing.publications[rootProject.name])
 }
